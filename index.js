@@ -44,7 +44,7 @@ app.post('/connectDevice', (req, res) => {
 
 app.post('/startScan', (req, res) => {
     console.log("startScan");
-    let deviceId = req.query.deviceId;
+    let deviceId = req.body.deviceId;
     if (deviceConnected) {
         scindex.startScan(deviceId, "none", (response) => {
             res.send(response);
@@ -56,7 +56,7 @@ app.post('/startScan', (req, res) => {
 
 app.post('/stopScan', (req, res) => {
     console.log("stopScan");
-    let deviceId = req.query.deviceId;
+    let deviceId = req.body.deviceId;
     if (deviceConnected) {
         scindex.stopScan(deviceId, (response) => {
             response.tags = scannedTags;
@@ -71,7 +71,7 @@ app.post('/stopScan', (req, res) => {
 app.post('/ledOn', (req, res) => {
     console.log("ledOn");
     if (deviceConnected) {
-        scindex.ledOn(req.body.tags, (response) => {
+        scindex.ledOn(req.body.deviceId, req.body.tags, (response) => {
             res.send(response);
         });
     } else {
@@ -79,10 +79,10 @@ app.post('/ledOn', (req, res) => {
     }
 })
 
-app.get('/ledOff', (req, res) => {
+app.post('/ledOff', (req, res) => {
     console.log("ledOff");
     if (deviceConnected) {
-        scindex.ledOff((response) => {
+        scindex.ledOff(req.body.deviceId, (response) => {
             res.send(response);
         });
     } else {
@@ -90,9 +90,9 @@ app.get('/ledOff', (req, res) => {
     }
 })
 
-app.get('/disconnectDevice', (req, res) => {
+app.post('/disconnectDevice', (req, res) => {
     console.log("disconnectDevice");
-    let deviceId = req.query.deviceId;
+    let deviceId = req.body.deviceId;
     if (deviceConnected) {
         scindex.disconnectDevice(deviceId, (response) => {
             res.send(response);

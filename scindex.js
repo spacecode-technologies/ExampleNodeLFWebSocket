@@ -150,6 +150,30 @@ exports.connection = async function(deviceId, callback) {
 
 // call this to connect the device where deviceId can be the serial number of the device or the ipAddress
 exports.connectDevice = async function(deviceId, callback) {
+    console.log("Total clients connected: ", sockets.length)
+    let deviceIdExists = false;
+    let foundItem = null;
+    let disconnectSuccess = false;
+    sockets.map(item => {
+        if (item.deviceId === deviceId) {
+            deviceIdExists = true;
+            foundItem = item;
+        }
+    })
+    if (deviceIdExists) {
+        sockets.splice(sockets.indexOf(foundItem), 1);
+        foundItem.socket.emit("generic", {
+            "eventName": "disconnectDevice",
+            "socketId": foundItem.selectedSocketId,
+            "deviceId": foundItem.connectDeviceSerialNumber
+        }, (response) => {
+            console.log("module:", response)
+            if (response.status) {
+                disconnectSuccess = true;
+            }
+        })
+    }
+
     sockets.push({
         deviceId: deviceId,
         socket: io("http://localhost:5454/", {
@@ -179,6 +203,7 @@ exports.connectDevice = async function(deviceId, callback) {
                                 item.deviceConnected = true;
                                 item.connectDeviceSerialNumber = response.serialNumber;
                             }
+                            console.log(item)
                             callback({
                                 "status": response.status,
                                 "message": response.message
@@ -242,11 +267,12 @@ exports.disconnectDevice = async function(deviceId, callback) {
 // function to start scan
 let iteration = 0
 exports.startScan = async function(deviceId, mode, callback) {
+    console.log("deviceId: ", deviceId);
     if (sockets.length > 0) {
         sockets.map(item => {
             if (item.deviceId === deviceId) {
                 if (item.deviceConnected) {
-                    socket.emit("generic", {
+                    item.socket.emit("generic", {
                         "eventName": "startScan",
                         "socketId": item.selectedSocketId,
                         "deviceId": item.connectDeviceSerialNumber,
@@ -263,11 +289,6 @@ exports.startScan = async function(deviceId, mode, callback) {
                         "message": "Device not connected"
                     })
                 }
-            } else {
-                callback({
-                    "status": false,
-                    "message": "Device not connected"
-                })
             }
         })
     } else {
@@ -285,7 +306,7 @@ exports.stopScan = async function(deviceId, callback) {
             sockets.map(item => {
                 if (item.deviceId === deviceId) {
                     if (item.deviceConnected) {
-                        socket.emit("generic", {
+                        item.socket.emit("generic", {
                             "eventName": "stopScan",
                             "socketId": item.selectedSocketId,
                             "deviceId": item.connectDeviceSerialNumber
@@ -321,44 +342,84 @@ exports.stopScan = async function(deviceId, callback) {
 }
 
 // function to turn the led on
-exports.ledOn = async function(tags, callback) {
+exports.ledOn = async function(deviceId, tags, callback) {
     console.log("selectedSocketId", selectedSocketId)
     console.log("deviceId", connectDeviceSerialNumber)
     console.log("deviceMode", deviceMode)
     console.log("tags", tags)
-    socket.emit("generic", {
-        "eventName": "ledOn",
-        "socketId": selectedSocketId,
-        "deviceId": connectDeviceSerialNumber,
-        "list": tags,
-        "mode": deviceMode
-    }, (response) => {
-        console.log("module:",response)
-        callback(response)
-    })
+    if (sockets.length > 0) {
+        if (sockets.length > 0) {
+            sockets.map(item => {
+                if (item.deviceId === deviceId) {
+                    if (item.deviceConnected) {
+                        item.socket.emit("generic", {
+                            "eventName": "ledOn",
+                            "socketId": selectedSocketId,
+                            "deviceId": connectDeviceSerialNumber,
+                            "list": tags,
+                            "mode": deviceMode
+                        }, (response) => {
+                            console.log("module:", response)
+                            callback(response)
+                        })
+                    } else {
+                        callback({
+                            "status": false,
+                            "message": "Device not connected"
+                        })
+                    }
+                }
+            })
+        }
+    } else {
+        callback({
+            "status": false,
+            "message": "No device connected"
+        })
+    }
 }
 
 // function to turn the led off
-exports.ledOff = async function(callback) {
-    socket.emit("generic", {
-        "eventName": "ledOff",
-        "socketId": selectedSocketId,
-        "deviceId": connectDeviceSerialNumber
-    }, (response) => {
-        callback(response);
-    })
+exports.ledOff = async function(deviceId, callback) {
+    if (sockets.length > 0) {
+        if (sockets.length > 0) {
+            sockets.map(item => {
+                if (item.deviceId === deviceId) {
+                    if (item.deviceConnected) {
+                        item.socket.emit("generic", {
+                            "eventName": "ledOff",
+                            "socketId": selectedSocketId,
+                            "deviceId": connectDeviceSerialNumber
+                        }, (response) => {
+                            callback(response);
+                        })
+                    } else {
+                        callback({
+                            "status": false,
+                            "message": "Device not connected"
+                        })
+                    }
+                }
+            })
+        }
+    } else {
+        callback({
+            "status": false,
+            "message": "No device connected"
+        })
+    }
 }
 
 // function to refresh the tag while having continues mode scanning
-exports.refreshTags = async function(callback) {
-    socket.emit("generic", {
-        "eventName": "refreshTags",
-        "socketId": selectedSocketId,
-        "deviceId": item.connectDeviceSerialNumber,
-    }, (response) => {
-        console.log("module:",response)
-        callback(response)
-    })
-}
+// exports.refreshTags = async function(callback) {
+//     socket.emit("generic", {
+//         "eventName": "refreshTags",
+//         "socketId": selectedSocketId,
+//         "deviceId": item.connectDeviceSerialNumber,
+//     }, (response) => {
+//         console.log("module:",response)
+//         callback(response)
+//     })
+// }
 
 
