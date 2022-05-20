@@ -251,11 +251,6 @@ exports.disconnectDevice = async function(deviceId, callback) {
                         "message": "Device not connected"
                     })
                 }
-            } else {
-                callback({
-                    "status": false,
-                    "message": "Device not connected"
-                })
             }
         })
     } else {
