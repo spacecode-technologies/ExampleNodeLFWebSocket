@@ -3,8 +3,6 @@ let express = require('express');
 const app = express()
 const port = 3000
 
-let deviceConnected = false;
-
 app.use(express.json());
 
 
@@ -13,7 +11,6 @@ app.post('/connectDevice', (req, res) => {
     let deviceId = req.body.deviceId;
     scindex.connectDevice(deviceId, (response) => {
         res.send(response);
-        deviceConnected = true;
         scindex.deviceConnectListener(deviceId, (response) => {
             console.log(response);
         });
@@ -43,60 +40,39 @@ app.post('/connectDevice', (req, res) => {
 app.post('/startScan', (req, res) => {
     console.log("startScan");
     let deviceId = req.body.deviceId;
-    if (deviceConnected) {
-        scindex.startScan(deviceId, "none", (response) => {
-            res.send(response);
-        });
-    } else {
-        res.send("Device not connected");
-    }
+    scindex.startScan(deviceId, "none", (response) => {
+        res.send(response);
+    });
 })
 
 app.post('/stopScan', (req, res) => {
     console.log("stopScan");
     let deviceId = req.body.deviceId;
-    if (deviceConnected) {
-        scindex.stopScan(deviceId, (response) => {
-            res.send(response);
-        });
-    } else {
-        res.send("Device not connected");
-    }
+    scindex.stopScan(deviceId, (response) => {
+        res.send(response);
+    });
 })
 
 app.post('/ledOn', (req, res) => {
     console.log("ledOn");
-    if (deviceConnected) {
-        scindex.ledOn(req.body.deviceId, req.body.tags, (response) => {
-            res.send(response);
-        });
-    } else {
-        res.send("Device not connected");
-    }
+    scindex.ledOn(req.body.deviceId, req.body.tags, (response) => {
+        res.send(response);
+    });
 })
 
 app.post('/ledOff', (req, res) => {
     console.log("ledOff");
-    if (deviceConnected) {
-        scindex.ledOff(req.body.deviceId, (response) => {
-            res.send(response);
-        });
-    } else {
-        res.send("Device not connected");
-    }
+    scindex.ledOff(req.body.deviceId, (response) => {
+        res.send(response);
+    });
 })
 
 app.post('/disconnectDevice', (req, res) => {
     console.log("disconnectDevice");
     let deviceId = req.body.deviceId;
-    if (deviceConnected) {
-        scindex.disconnectDevice(deviceId, (response) => {
-            res.send(response);
-            deviceConnected = false;
-        });
-    } else {
-        res.send("Device not connected");
-    }
+    scindex.disconnectDevice(deviceId, (response) => {
+        res.send(response);
+    });
 })
 
 app.listen(port, () => {

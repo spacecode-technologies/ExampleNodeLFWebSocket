@@ -310,7 +310,7 @@ exports.stopScan = async function(deviceId, callback) {
                         console.log("module:", response)
                         response.scannedTags = item.scannedTags
                         callback(response)
-                        response.scannedTags = []
+                        item.scannedTags = []
                     })
                 } else {
                     callback({
