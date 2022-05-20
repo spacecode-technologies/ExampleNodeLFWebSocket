@@ -47,6 +47,7 @@ exports.addTagListener = async function(deviceId, callback) {
             if (item.deviceId === deviceId)
                 item.socket.on("receive_addTag", (response) => {
                     console.log("module:", response)
+                    item.scannedTags.push(response);
                     callback(response);
                 })
         })
@@ -185,7 +186,8 @@ exports.connectDevice = async function(deviceId, callback) {
         deviceConnected: false,
         connectDeviceSerialNumber: null,
         deviceMode: deviceId.includes(":") ? "ethMode" : "usbMode",
-        selectedSocketId: null
+        selectedSocketId: null,
+        scannedTags: []
     })
     if (sockets.length > 0) {
         sockets.map(item => {
@@ -312,7 +314,9 @@ exports.stopScan = async function(deviceId, callback) {
                             "deviceId": item.connectDeviceSerialNumber
                         }, (response) => {
                             console.log("module:", response)
+                            response.scannedTags = item.scannedTags
                             callback(response)
+                            response.scannedTags = []
                         })
                     } else {
                         callback({

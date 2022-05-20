@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon index.js"
+    "start": "nodemon index.js",
+    "exe": "nexe ./index.js -t win32-x86-10.13.0 --name ExampleNodeLFWebSocket-V1.0.0"
   },
   "author": "",
   "license": "ISC",
@@ -13,5 +14,8 @@
     "express": "^4.18.1",
     "nodemon": "^2.0.16",
     "socket.io-client": "^4.5.0"
+  },
+  "devDependencies": {
+    "nexe": "^4.0.0-rc.1"
   }
 }

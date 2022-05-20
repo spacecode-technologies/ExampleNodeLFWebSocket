@@ -4,7 +4,6 @@ const app = express()
 const port = 3000
 
 let deviceConnected = false;
-let scannedTags = [];
 
 app.use(express.json());
 
@@ -29,7 +28,6 @@ app.post('/connectDevice', (req, res) => {
 
         scindex.addTagListener(deviceId, (response) => {
             console.log(response);
-            scannedTags.push(response);
         });
 
         scindex.ledTurnedOnListener(deviceId, (response) => {
@@ -59,9 +57,7 @@ app.post('/stopScan', (req, res) => {
     let deviceId = req.body.deviceId;
     if (deviceConnected) {
         scindex.stopScan(deviceId, (response) => {
-            response.tags = scannedTags;
             res.send(response);
-            scannedTags = [];
         });
     } else {
         res.send("Device not connected");
