@@ -177,7 +177,7 @@ exports.connectDevice = async function(deviceId, callback) {
 
     sockets.push({
         deviceId: deviceId,
-        socket: io("http://localhost:5454/", {
+        socket: io("http://localhost:3000/", {
             reconnectionDelayMax: 10000,
             auth: {
                 token: "v3"
@@ -197,6 +197,7 @@ exports.connectDevice = async function(deviceId, callback) {
                         console.log("module:", response1)
                         // item.selectedSocketId = response1.sockets[0].socketId
                         item.socket.emit("send_connectDevice", {
+                            "type": "websocket",
                             "socketId": "",
                             deviceId
                         }, (response) => {
@@ -235,6 +236,7 @@ exports.disconnectDevice = async function(deviceId, callback) {
             if (item.deviceId === deviceId) {
                 if (item.deviceConnected) {
                     item.socket.emit("generic", {
+                        "type": "websocket",
                         "eventName": "disconnectDevice",
                         "socketId": item.selectedSocketId,
                         "deviceId": item.connectDeviceSerialNumber
@@ -270,6 +272,7 @@ exports.startScan = async function(deviceId, mode, callback) {
             if (item.deviceId === deviceId) {
                 if (item.deviceConnected) {
                     item.socket.emit("generic", {
+                        "type": "websocket",
                         "eventName": "startScan",
                         "socketId": item.selectedSocketId,
                         "deviceId": item.connectDeviceSerialNumber,
@@ -303,6 +306,7 @@ exports.stopScan = async function(deviceId, callback) {
             if (item.deviceId === deviceId) {
                 if (item.deviceConnected) {
                     item.socket.emit("generic", {
+                        "type": "websocket",
                         "eventName": "stopScan",
                         "socketId": item.selectedSocketId,
                         "deviceId": item.connectDeviceSerialNumber
@@ -339,6 +343,7 @@ exports.ledOn = async function(deviceId, tags, callback) {
             if (item.deviceId === deviceId) {
                 if (item.deviceConnected) {
                     item.socket.emit("generic", {
+                        "type": "websocket",
                         "eventName": "ledOn",
                         "socketId": selectedSocketId,
                         "deviceId": connectDeviceSerialNumber,
@@ -371,6 +376,7 @@ exports.ledOff = async function(deviceId, callback) {
             if (item.deviceId === deviceId) {
                 if (item.deviceConnected) {
                     item.socket.emit("generic", {
+                        "type": "websocket",
                         "eventName": "ledOff",
                         "socketId": selectedSocketId,
                         "deviceId": connectDeviceSerialNumber
